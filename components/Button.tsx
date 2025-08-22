@@ -4,9 +4,10 @@ import { FontAwesome, Ionicons } from "@expo/vector-icons";
 type ButtonProps = {
     label: string;
     theme?: "primary" | "secondary";
+    onPress?: () => void;
 };
 
-export default function Button({ label, theme }: ButtonProps) {
+export default function Button({ label, theme, onPress }: ButtonProps) {
     if (theme === "primary") {
         return (
             <View
@@ -23,7 +24,7 @@ export default function Button({ label, theme }: ButtonProps) {
             >
                 <Pressable
                     style={styles.button}
-                    onPress={() => alert("Button Pressed")}
+                    onPress={onPress}
                 >
                     <FontAwesome
                         name="picture-o"
@@ -42,7 +43,7 @@ export default function Button({ label, theme }: ButtonProps) {
             <View style={styles.buttonContainer}>
                 <Pressable
                     style={styles.button}
-                    onPress={() => alert("Button Pressed")}
+                    onPress={onPress}
                 >
                     <FontAwesome name="picture-o" size={18} color="blue" />    
                     <Text style={styles.buttonLabel}>{label}</Text>
@@ -55,7 +56,7 @@ export default function Button({ label, theme }: ButtonProps) {
         <View style={styles.buttonContainer}>
             <Pressable
                 style={styles.button}
-                onPress={() => alert("Button Pressed")}
+                onPress={onPress}
             >
                 <Ionicons name="image" size={24} color="blue" />    
                 <Text style={styles.buttonLabel}>{label}</Text>
