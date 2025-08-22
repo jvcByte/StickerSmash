@@ -17,6 +17,7 @@ export default function Button({ label, theme }: ButtonProps) {
                         borderWidth: 2,
                         borderRadius: 10,
                         backgroundColor: "white",
+                        marginTop: 20,
                     }
                 ]}
             >
@@ -67,12 +68,14 @@ const styles = StyleSheet.create({
     buttonContainer: {
         width: 320,
         height: 68,
-        marginHorizontal: 20,
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 3,
+        // marginHorizontal: 20,
+        // alignItems: "center",
+        // justifyContent: "center",
+        // padding: 3,
+        marginVertical: 10,
     },
     button: {
+        backgroundColor: "white",
         borderRadius: 10,
         width: "100%",
         height: "100%",
