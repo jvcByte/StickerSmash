@@ -2,6 +2,7 @@
 
 ## Project Overview
 Create a comprehensive mechanic workshop management application using **Expo** for React Native that handles all aspects of automotive service business operations with a focus on modularity, scalability, and user experience.
+implement themeing (dark and light mode)
 
 ## Core Application Requirements
 
@@ -110,18 +111,168 @@ Create a comprehensive mechanic workshop management application using **Expo** f
 ## Technical Implementation Guidelines
 
 ### Project Structure
-```
-src/
-├── components/          # Reusable UI components
-├── screens/            # Screen components organized by feature
-├── navigation/         # Navigation configuration
-├── services/          # API calls and business logic
-├── store/             # State management (Redux/Zustand)
-├── utils/             # Helper functions and utilities
-├── types/             # TypeScript type definitions
-├── constants/         # App constants and configuration
-└── hooks/             # Custom React hooks
-```
+mech-op/
+├── app/                          # Expo Router file-based routing (main app logic)
+│   ├── (auth)/                   # Auth group layout
+│   │   ├── login.tsx
+│   │   ├── register.tsx
+│   │   └── _layout.tsx
+│   ├── (dashboard)/              # Protected dashboard routes
+│   │   ├── (admin)/              # Admin-only routes
+│   │   │   ├── users.tsx
+│   │   │   ├── reports.tsx
+│   │   │   └── settings.tsx
+│   │   ├── (mechanic)/           # Mechanic role routes
+│   │   │   ├── jobs.tsx
+│   │   │   ├── timesheet.tsx
+│   │   │   └── inventory.tsx
+│   │   ├── (customer)/           # Customer portal routes
+│   │   │   ├── vehicles.tsx
+│   │   │   ├── appointments.tsx
+│   │   │   └── history.tsx
+│   │   ├── index.tsx             # Main dashboard
+│   │   └── _layout.tsx           # Dashboard layout
+│   ├── customers/                # Customer management
+│   │   ├── [id].tsx              # Dynamic customer detail
+│   │   ├── create.tsx
+│   │   └── index.tsx
+│   ├── vehicles/                 # Vehicle management
+│   │   ├── [id]/                 # Vehicle detail group
+│   │   │   ├── index.tsx         # Vehicle overview
+│   │   │   ├── history.tsx       # Service history
+│   │   │   └── edit.tsx          # Edit vehicle
+│   │   ├── create.tsx
+│   │   └── index.tsx
+│   ├── jobs/                     # Work orders/jobs
+│   │   ├── [id]/
+│   │   │   ├── index.tsx         # Job detail
+│   │   │   ├── edit.tsx
+│   │   │   └── timeline.tsx
+│   │   ├── create.tsx
+│   │   └── index.tsx
+│   ├── inventory/                # Inventory management
+│   │   ├── [id].tsx
+│   │   ├── orders.tsx
+│   │   └── index.tsx
+│   ├── complaints/               # Complaint management
+│   │   ├── [id].tsx
+│   │   └── index.tsx
+│   ├── _layout.tsx               # Root layout
+│   └── +not-found.tsx           # 404 page
+│
+├── components/                   # Reusable UI components
+│   ├── ui/                       # Base UI components
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
+│   │   ├── Card.tsx
+│   │   ├── Modal.tsx
+│   │   ├── LoadingSpinner.tsx
+│   │   └── index.ts              # Barrel exports
+│   ├── forms/                    # Form components
+│   │   ├── CustomerForm.tsx
+│   │   ├── VehicleForm.tsx
+│   │   ├── JobForm.tsx
+│   │   └── ComplaintForm.tsx
+│   ├── lists/                    # List components
+│   │   ├── CustomerList.tsx
+│   │   ├── VehicleList.tsx
+│   │   ├── JobList.tsx
+│   │   └── InventoryList.tsx
+│   ├── charts/                   # Analytics components
+│   │   ├── RevenueChart.tsx
+│   │   ├── JobStatusChart.tsx
+│   │   └── PerformanceChart.tsx
+│   ├── navigation/               # Navigation components
+│   │   ├── DrawerContent.tsx
+│   │   ├── TabBar.tsx
+│   │   └── HeaderMenu.tsx
+│   └── workshop/                 # Workshop-specific components
+│       ├── ServiceTimeline.tsx
+│       ├── AttendanceTracker.tsx
+│       ├── JobCard.tsx
+│       └── VehicleCard.tsx
+│
+├── lib/                          # Core utilities and configurations
+│   ├── api/                      # API layer
+│   │   ├── client.ts             # HTTP client configuration
+│   │   ├── auth.ts               # Authentication API calls
+│   │   ├── customers.ts          # Customer API calls
+│   │   ├── vehicles.ts           # Vehicle API calls
+│   │   ├── jobs.ts               # Job API calls
+│   │   ├── inventory.ts          # Inventory API calls
+│   │   └── complaints.ts         # Complaint API calls
+│   ├── database/                 # Local database
+│   │   ├── schema.ts             # SQLite schema definitions
+│   │   ├── migrations.ts         # Database migrations
+│   │   └── queries.ts            # Common queries
+│   ├── utils/                    # Utility functions
+│   │   ├── formatters.ts         # Data formatting utilities
+│   │   ├── validators.ts         # Input validation
+│   │   ├── permissions.ts        # Role-based permissions
+│   │   ├── notifications.ts      # Notification helpers
+│   │   └── storage.ts            # Local storage utilities
+│   ├── constants/                # App constants
+│   │   ├── colors.ts             # Color palette
+│   │   ├── sizes.ts              # Spacing and sizing
+│   │   ├── roles.ts              # User roles and permissions
+│   │   └── config.ts             # App configuration
+│   └── types/                    # TypeScript type definitions
+│       ├── auth.ts               # Authentication types
+│       ├── customer.ts           # Customer data types
+│       ├── vehicle.ts            # Vehicle data types
+│       ├── job.ts                # Job/work order types
+│       ├── inventory.ts          # Inventory types
+│       └── api.ts                # API response types
+│
+├── hooks/                        # Custom React hooks
+│   ├── useAuth.ts                # Authentication hook
+│   ├── usePermissions.ts         # Role-based permissions
+│   ├── useOfflineSync.ts         # Offline synchronization
+│   ├── useNotifications.ts       # Notification management
+│   ├── useCamera.ts              # Camera functionality
+│   └── useLocation.ts            # Location services
+│
+├── store/                        # Global state management
+│   ├── slices/                   # Redux slices or Zustand stores
+│   │   ├── authSlice.ts
+│   │   ├── customerSlice.ts
+│   │   ├── vehicleSlice.ts
+│   │   ├── jobSlice.ts
+│   │   ├── inventorySlice.ts
+│   │   └── uiSlice.ts
+│   ├── index.ts                  # Store configuration
+│   └── middleware.ts             # Store middleware
+│
+├── assets/                       # Static assets
+│   ├── images/                   # App images and icons
+│   ├── fonts/                    # Custom fonts
+│   └── sounds/                   # Notification sounds
+│
+├── docs/                         # Documentation
+│   ├── API.md                    # API documentation
+│   ├── SETUP.md                  # Setup instructions
+│   └── DEPLOYMENT.md             # Deployment guide
+│
+├── __tests__/                    # Test files
+│   ├── components/
+│   ├── screens/
+│   ├── utils/
+│   └── __mocks__/
+│
+├── .expo/                        # Expo configuration (auto-generated)
+├── node_modules/                 # Dependencies (auto-generated)
+│
+├── app.config.ts                 # Expo configuration
+├── package.json                  # Dependencies and scripts
+├── tsconfig.json                 # TypeScript configuration
+├── babel.config.js               # Babel configuration
+├── metro.config.js               # Metro bundler configuration
+├── .eslintrc.js                  # ESLint configuration
+├── .prettierrc.js                # Prettier configuration
+├── .gitignore                    # Git ignore rules
+├── .env.example                  # Environment variables template
+├── README.md                     # Project documentation
+└── yarn.lock / package-lock.json # Dependency lock file
 
 ### Code Quality & Best Practices
 - **TypeScript** for type safety and better developer experience
@@ -186,3 +337,16 @@ src/
 - **Compliance** with automotive industry standards and data protection regulations
 
 This application should demonstrate enterprise-level architecture while maintaining the flexibility and ease of development that Expo provides, ensuring both current functionality and future scalability.
+
+# Color Palette
+
+## Professional Industrial Schemes
+
+**1. Automotive Blue & Orange (Recommended)**
+- Primary: Deep Blue (#1E3A8A)
+- Secondary: Safety Orange (#F97316)
+- Accent: Steel Gray (#64748B)
+- Background: Clean White (#FFFFFF)
+- Dark mode: Charcoal (#1F2937)
+- *Why it works: Blue conveys trust and professionalism, orange suggests energy and action*
+
