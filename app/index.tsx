@@ -17,6 +17,7 @@ export default function WelcomeScreen() {
                 <Link href="/sign-up" style={styles.link}>Sign Up</Link>
                 <Link href="/verify" style={styles.link}>Verify</Link>
                 <Link href="/(protected)/(tabs)" style={styles.link}>Go to Protected Screen</Link>
+                <Link href="/(protected)/(admin)" style={styles.link}>Go to Admin Screen</Link>
             </ThemedView>
             <CustomButton
                 text="Sign Out"

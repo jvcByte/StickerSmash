@@ -3,13 +3,13 @@ import { ThemedText } from "@/components/ThemedText";
 import { StyleSheet } from "react-native";
 import { Link } from "expo-router";
 
-export default function CustomerList() {
+export default function CustomerDetails() {
     return (
         <ThemedView style={styles.container}>
-            <ThemedText>Customer List</ThemedText>
+            <ThemedText>Customer Details</ThemedText>
             <ThemedView style={styles.linkContainer}>
-                <Link href="/(protected)/(tabs)/customers/[id]" style={styles.link}>View Customers</Link>
-                <Link href="/(protected)/(tabs)/customers/add" style={styles.link}>Add Customer</Link>
+                <Link href="/(protected)/(admin)/customers/[id]" style={styles.link}>Edit Customer</Link>
+                <Link href="/(protected)/(admin)/customers/[id]" style={styles.link}>Delete Customer</Link>
             </ThemedView>
         </ThemedView>
     );
