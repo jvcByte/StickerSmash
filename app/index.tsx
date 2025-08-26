@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native"
+import { ActivityIndicator, StyleSheet } from "react-native"
 import { Link } from "expo-router"
 import { useAuth } from "@clerk/clerk-expo"
 import CustomButton from "@/components/ui/CustomButton";
@@ -6,7 +6,17 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 
 export default function WelcomeScreen() {
-    const { signOut, isSignedIn } = useAuth();
+    const { signOut, isSignedIn, isLoaded } = useAuth();
+    console.log('Is Loaded: ', isLoaded);
+    console.log('Is Signed In: ', isSignedIn);
+
+    if (!isLoaded) {
+        return (
+            <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" />
+            </ThemedView>
+        );
+    }
 
     return (
         <ThemedView style={styles.container}>

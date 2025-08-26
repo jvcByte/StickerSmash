@@ -1,9 +1,8 @@
-import CustomButton from "./ui/CustomButton"
-import { useEffect, useCallback } from "react"
-import * as WebBrowser from 'expo-web-browser'
-import { useSSO } from "@clerk/clerk-expo"
-import * as AuthSession from "expo-auth-session"
-import { router } from "expo-router"
+import CustomButton from "./ui/CustomButton";
+import { useEffect, useCallback } from "react";
+import * as WebBrowser from 'expo-web-browser';
+import { useSSO, useUser } from "@clerk/clerk-expo";
+import * as AuthSession from "expo-auth-session";
 
 export const useWarmUpBrowser = () => {
     useEffect(() => {
@@ -21,37 +20,27 @@ export const useWarmUpBrowser = () => {
 WebBrowser.maybeCompleteAuthSession();
 
 export default function SignInWith() {
-    useWarmUpBrowser()
-
-    // Use the `useSSO()` hook to access the `startSSOFlow()` method
-    const { startSSOFlow } = useSSO()
+    const { isLoaded: isUserLoaded } = useUser();
+    const { startSSOFlow } = useSSO();
+    
+    useWarmUpBrowser();
 
     const onPress = useCallback(async () => {
+        if (!isUserLoaded) return;
+        
         try {
             // Start the authentication process by calling `startSSOFlow()`
-            const { createdSessionId, setActive, /*signIn, signUp */ } = await startSSOFlow({
+            const { createdSessionId, setActive } = await startSSOFlow({
                 strategy: 'oauth_google',
                 // For web, defaults to current path
                 // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
-                // For more info, see https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturioptions
-                redirectUrl: AuthSession.makeRedirectUri(),
-            })
+                redirectUrl: AuthSession.makeRedirectUri({}),
+            });
 
             // If sign in was successful, set the active session
             if (createdSessionId) {
-                setActive!({
-                    session: createdSessionId,
-                    navigate: async ({ session }) => {
-                        if (session?.currentTask) {
-                            // Check for tasks and navigate to custom UI to help users resolve them
-                            // See https://clerk.com/docs/custom-flows/overview#session-tasks
-                            console.log(session?.currentTask)
-                            return
-                        }
-
-                        router.push('/')
-                    },
-                })
+                await setActive!({ session: createdSessionId });
+                // The AuthLayout will handle the redirection based on user role
             } else {
                 // If there is no `createdSessionId`,
                 // there are missing requirements, such as MFA
@@ -63,7 +52,7 @@ export default function SignInWith() {
             // for more info on error handling
             console.error(JSON.stringify(err, null, 2))
         }
-    }, [startSSOFlow])
+    }, [isUserLoaded, startSSOFlow])
 
 
     return (

@@ -10,10 +10,17 @@ import CustomButton from '@/components/ui/CustomButton';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod/v3';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { isClerkAPIResponseError, useSignIn } from '@clerk/clerk-expo';
+import { isClerkAPIResponseError, useSignIn, useUser } from '@clerk/clerk-expo';
 import { router } from 'expo-router';
 import SignInWith from '@/components/SignInWith';
 import AuthNav from '@/components/AuthNav';
+
+type ClerkUser = {
+    id: string;
+    publicMetadata?: {
+        role?: string;
+    };
+};
 
 const signInSchema = z.object({
     email: z.string({ message: 'Email is required' }).email({ message: 'Invalid email' }),
@@ -44,6 +51,8 @@ export default function SignInScreen() {
         resolver: zodResolver(signInSchema),
     });
     const { signIn, isLoaded, setActive } = useSignIn();
+    const { user } = useUser();
+    const clerkUser = user as ClerkUser | null | undefined;
 
     console.log('Errors: ', errors)
 
@@ -61,7 +70,11 @@ export default function SignInScreen() {
             if (signInResult.status === 'complete') {
                 console.log('Sign in complete')
                 setActive({ session: signInResult.createdSessionId })
-                router.push('/(protected)/(tabs)')
+                if (clerkUser?.publicMetadata?.role === 'admin') {
+                    router.push('/(protected)/(admin)')
+                } else {
+                    router.push('/(protected)/(tabs)')
+                }
             } else {
                 console.log('Sign in not complete: ', signInResult)
             }
