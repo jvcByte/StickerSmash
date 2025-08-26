@@ -55,7 +55,7 @@ export default function VerifyScreen() {
             if (signUpResult.status === 'complete') {
                 console.log('Sign up complete')
                 setActive({ session: signUpResult.createdSessionId })
-                router.push('/')
+                router.push('/(protected)/(tabs)')
             } else {
                 console.log('Sign up not complete: ', signUpResult)
                 setError('root', { message: 'Could not verify code. Please try again' })

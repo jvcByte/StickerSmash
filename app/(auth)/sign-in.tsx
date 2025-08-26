@@ -53,6 +53,7 @@ export default function SignInScreen() {
     const { signIn, isLoaded, setActive } = useSignIn();
     const { user } = useUser();
     const clerkUser = user as ClerkUser | null | undefined;
+    const role = clerkUser?.publicMetadata?.role;
 
     console.log('Errors: ', errors)
 
@@ -70,7 +71,7 @@ export default function SignInScreen() {
             if (signInResult.status === 'complete') {
                 console.log('Sign in complete')
                 setActive({ session: signInResult.createdSessionId })
-                if (clerkUser?.publicMetadata?.role === 'admin') {
+                if (role === 'admin') {
                     router.push('/(protected)/(admin)')
                 } else {
                     router.push('/(protected)/(tabs)')
