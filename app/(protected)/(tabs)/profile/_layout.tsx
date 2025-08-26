@@ -1,9 +1,9 @@
 import { Stack } from 'expo-router';
 
-export default function HistoryLayout() {
+export default function ProfileLayout() {
     return (
         <Stack>
-            <Stack.Screen name="index" options={{ title: 'History' }} />
+            <Stack.Screen name="index" options={{ headerShown: false, title: 'Profile' }} />
         </Stack>
     );
 }
