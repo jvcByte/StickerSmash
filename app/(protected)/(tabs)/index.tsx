@@ -91,7 +91,6 @@ export default function HomeScreen() {
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <ThemedView style={styles.header}>
-        <ThemedText style={[styles.title, { color: colors.text }]}>Dashboard</ThemedText>
         <ThemedText style={[styles.subtitle, { color: colors.tabIconDefault }]}>
           Welcome back! Here&apos;s what&apos;s happening today.
         </ThemedText>
@@ -226,11 +225,6 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 20,
     paddingTop: 8,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
