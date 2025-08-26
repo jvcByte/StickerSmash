@@ -36,7 +36,14 @@
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
     "react-native-web": "~0.20.0",
-    "react-native-webview": "13.13.5"
+    "@clerk/clerk-expo": "^2.14.23",
+    "@hookform/resolvers": "^5.2.1",
+    "expo-linear-gradient": "~14.1.5",
+    "expo-secure-store": "^14.2.3",
+    "react-hook-form": "^7.62.0",
+    "zod": "^4.1.0",
+    "expo-auth-session": "~6.2.1",
+    "expo-crypto": "~14.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
