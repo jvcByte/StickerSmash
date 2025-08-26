@@ -114,6 +114,24 @@ export default function TabLayout() {
             renderTabBarIcon('profile', focused, 'person', notificationCounts.profile),
         }}
       />
+      <Tabs.Screen
+        name='payments'
+        options={{
+          href: null
+        }}
+      />
+      <Tabs.Screen
+        name='support'
+        options={{
+          href: null
+        }}
+      />
+      <Tabs.Screen
+        name='documents'
+        options={{
+          href: null
+        }}
+      />
     </Tabs>
   );
 }

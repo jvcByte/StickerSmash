@@ -6,53 +6,6 @@ import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
-const DashboardCard = ({ 
-  title, 
-  count, 
-  icon, 
-  color, 
-  onPress 
-}: { 
-  title: string; 
-  count: number | string; 
-  icon: string; 
-  color: string; 
-  onPress: () => void 
-}) => {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-  
-  return (
-    <TouchableOpacity 
-      style={[styles.card, { 
-        borderLeftWidth: 4,
-        borderLeftColor: color,
-        backgroundColor: colors.background,
-        shadowColor: colors.text,
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
-      }]} 
-      onPress={onPress}
-    >
-      <ThemedView style={styles.cardContent}>
-        <ThemedView style={[styles.iconContainer, { backgroundColor: `${color}20` }]}>
-          <FontAwesome5 name={icon} size={20} color={color} />
-        </ThemedView>
-        <ThemedView style={styles.cardText}>
-          <ThemedText type="defaultSemiBold" style={[styles.cardTitle, { color: colors.text }]}>
-            {title}
-          </ThemedText>
-          <ThemedText style={[styles.cardCount, { color: colors.tabIconSelected }]}>
-            {count}
-          </ThemedText>
-        </ThemedView>
-      </ThemedView>
-    </TouchableOpacity>
-  );
-};
-
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
@@ -147,7 +100,7 @@ export default function HomeScreen() {
       {/* Vehicle Status */}
       <ThemedView style={styles.statsContainer}>
         <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>My Vehicle</ThemedText>
-        <ThemedView style={[styles.vehicleCard, { backgroundColor: colors.card }]}>
+        <ThemedView style={[styles.vehicleCard, { backgroundColor: colors.background }]}>
           <ThemedView style={styles.vehicleHeader}>
             <ThemedText style={[styles.vehicleMake, { color: colors.text }]}>
               {vehicleStatus.year} {vehicleStatus.make} {vehicleStatus.model}
@@ -223,8 +176,9 @@ export default function HomeScreen() {
             <TouchableOpacity 
               key={service.id}
               style={[styles.serviceItem, { 
-                backgroundColor: colors.card,
+                backgroundColor: colors.background,
                 borderLeftColor: service.color,
+                borderLeftWidth: 4,
               }]}
               onPress={() => router.push(`/services/${service.id}`)}
             >
@@ -257,7 +211,7 @@ export default function HomeScreen() {
           style={[styles.helpButton, { backgroundColor: colors.tint }]}
           onPress={() => router.push('/support')}
         >
-          <ThemedText style={[styles.helpButtonText, { color: 'white' }]}>Contact Support</ThemedText>
+          <ThemedText style={[styles.helpButtonText, { color: colors.background }]}>Contact Support</ThemedText>
         </TouchableOpacity>
       </ThemedView>
     </ScrollView>
@@ -365,6 +319,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.1)',
   },
   vehicleHeader: {
     marginBottom: 16,
