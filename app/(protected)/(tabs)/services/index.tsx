@@ -75,61 +75,31 @@ const carData: CarData = {
             mileage: 35500,
             notes: 'Regular maintenance completed. No issues found.'
         },
-        {
-            id: 'service-4',
-            date: '2023-02-15',
-            type: 'Inspection',
-            status: 'completed',
-            services: ['Multi-point Inspection', 'Fluid Top-off', 'Tire Rotation'],
-            cost: 89.99,
-            mileage: 32500,
-            notes: 'Vehicle in good condition. No immediate concerns.'
-        },
-        {
-            id: 'service-5',
-            date: '2022-11-20',
-            type: 'Maintenance',
-            status: 'completed',
-            services: ['Oil Change', 'Tire Rotation', 'Brake Inspection'],
-            cost: 129.99,
-            mileage: 29500,
-            notes: 'Regular service completed. Brakes at 60% life remaining.'
-        },
-        {
-            id: 'service-6',
-            date: '2022-08-10',
-            type: 'Tire Service',
-            status: 'completed',
-            services: ['Tire Rotation', 'Wheel Balance', 'Tire Pressure Check'],
-            cost: 75.50,
-            mileage: 26500,
-            notes: 'Tires wearing evenly. Next rotation due in 6,000 miles.'
-        }
     ],
     upcomingServices: [
         {
-            id: '4',
+            id: 'upcoming-1',
             date: '2024-02-15',
             scheduledDate: '2024-02-15',
-            type: 'Routine Maintenance',
+            type: 'Scheduled Maintenance',
             status: 'scheduled',
             services: ['Oil Change', 'Tire Rotation', 'Fluid Check'],
             cost: 199.99,
             estimatedCost: 199.99,
             mileage: 45000,
-            notes: 'Scheduled routine maintenance.'
+            notes: 'Regular scheduled maintenance.'
         },
         {
-            id: '5',
+            id: 'upcoming-2',
             date: '2024-05-15',
             scheduledDate: '2024-05-15',
             type: 'Major Service',
             status: 'scheduled',
-            services: ['Transmission Fluid', 'Coolant Flush', 'Spark Plugs'],
+            services: ['Transmission Service', 'Coolant Flush', 'Brake Inspection'],
             cost: 349.99,
             estimatedCost: 349.99,
             mileage: 48000,
-            notes: 'Major scheduled service.'
+            notes: 'Major service interval.'
         }
     ]
 };
@@ -141,7 +111,7 @@ const statusColors = {
     overdue: '#F44336'
 };
 
-export default function CarServices() { 
+export default function CarServices() {
     const colorScheme = useColorScheme();
     const colors = Colors[colorScheme ?? 'light'];
     const [activeTab, setActiveTab] = useState<'history' | 'upcoming'>('history');
@@ -160,16 +130,100 @@ export default function CarServices() {
         });
     };
 
-    const calculateServiceProgress = () => {
-        const totalServices = carData.serviceHistory.length + carData.upcomingServices.length;
-        const completedServices = carData.serviceHistory.length;
-        return Math.round((completedServices / totalServices) * 100);
+    const renderServiceCard = (service: Service) => {
+        const isExpanded = expandedService === service.id;
+        const isHistory = activeTab === 'history';
+        
+        return (
+            <ThemedView 
+                key={service.id} 
+                style={[
+                    styles.serviceCard, 
+                    { 
+                        backgroundColor: colors.background,
+                        borderColor: colors.border,
+                        shadowColor: colors.text
+                    }
+                ]}
+            >
+                <ThemedView style={styles.serviceHeader}>
+                    <ThemedText style={[styles.serviceType, { color: colors.text }]}>
+                        {service.type}
+                    </ThemedText>
+                    <ThemedView 
+                        style={[
+                            styles.statusBadge, 
+                            { 
+                                backgroundColor: `${statusColors[service.status]}20`,
+                            }
+                        ]}
+                    >
+                        <ThemedText style={[styles.statusText, { color: statusColors[service.status] }]}>
+                            {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
+                        </ThemedText>
+                    </ThemedView>
+                </ThemedView>
+
+                <ThemedText style={[styles.serviceDate, { color: colors.tabIconDefault }]}>
+                    {formatDate(service.date || service.scheduledDate)}
+                    {service.mileage && ` • ${service.mileage.toLocaleString()} mi`}
+                </ThemedText>
+
+                <ThemedView style={styles.servicesList}>
+                    {service.services.slice(0, 3).map((item, index) => (
+                        <ThemedView key={index} style={styles.serviceItem}>
+                            <Ionicons 
+                                name={isHistory ? "checkmark-circle" : "time-outline"} 
+                                size={16} 
+                                color={isHistory ? "#4CAF50" : "#2196F3"} 
+                            />
+                            <ThemedText style={[styles.serviceItemText, { color: colors.text }]}>
+                                {item}
+                            </ThemedText>
+                        </ThemedView>
+                    ))}
+                    {service.services.length > 3 && (
+                        <ThemedText style={{ color: colors.tabIconDefault, fontSize: 13, marginTop: 4 }}>
+                            +{service.services.length - 3} more services
+                        </ThemedText>
+                    )}
+                </ThemedView>
+
+                <ThemedView style={[styles.serviceFooter, { borderTopColor: colors.border }]}>
+                    <ThemedText style={[styles.costText, { color: colors.text }]}>
+                        ${(service.cost || service.estimatedCost || 0).toFixed(2)}
+                    </ThemedText>
+                    <TouchableOpacity 
+                        style={[styles.detailsButton, { borderColor: colors.border }]}
+                        onPress={() => toggleService(service.id)}
+                    >
+                        <ThemedText style={[styles.detailsButtonText, { color: colors.tint }]}>
+                            {isExpanded ? 'Show Less' : 'View Details'}
+                        </ThemedText>
+                        <Ionicons 
+                            name={isExpanded ? 'chevron-up' : 'chevron-down'} 
+                            size={16} 
+                            color={colors.tint} 
+                        />
+                    </TouchableOpacity>
+                </ThemedView>
+
+                {isExpanded && service.notes && (
+                    <ThemedView style={[styles.notesContainer, { backgroundColor: `${colors.border}20` }]}>
+                        <ThemedText style={[styles.notesLabel, { color: colors.tabIconDefault }]}>
+                            Notes:
+                        </ThemedText>
+                        <ThemedText style={[styles.notesText, { color: colors.text }]}>
+                            {service.notes}
+                        </ThemedText>
+                    </ThemedView>
+                )}
+            </ThemedView>
+        );
     };
 
-    const progress = calculateServiceProgress();
-
     return (
-        <ThemedView style={[styles.container, { backgroundColor: colors.background }]}>
+        <ThemedView style={styles.container}>
             <ScrollView
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollContent}
@@ -181,60 +235,27 @@ export default function CarServices() {
                             <Ionicons name="car-sport" size={24} color={colors.tint} />
                         </ThemedView>
                         <ThemedView style={styles.vehicleInfo}>
-                            <ThemedText type="subtitle" style={{ color: colors.text }}>{carData.year} {carData.make} {carData.model}</ThemedText>
-                            <ThemedText style={[styles.licensePlate, { color: colors.tabIconDefault }]}>{carData.licensePlate}</ThemedText>
-                        </ThemedView>
-                    </ThemedView>
-
-                    <ThemedView style={styles.vehicleDetails}>
-                        <ThemedView style={[styles.detailItem, { borderRightWidth: 1, borderBottomWidth: 1, borderColor: colors.border }]}>
-                            <ThemedText style={[styles.detailLabel, { color: colors.tabIconDefault }]}>VIN</ThemedText>
-                            <ThemedText style={{ color: colors.text }}>{carData.vin}</ThemedText>
-                        </ThemedView>
-                        <ThemedView style={[styles.detailItem, { borderBottomWidth: 1, borderColor: colors.border }]}>
-                            <ThemedText style={[styles.detailLabel, { color: colors.tabIconDefault }]}>Mileage</ThemedText>
-                            <ThemedText style={{ color: colors.text }}>{carData.mileage.toLocaleString()} mi</ThemedText>
-                        </ThemedView>
-                        <ThemedView style={[styles.detailItem, { borderRightWidth: 1, borderColor: colors.border }]}>
-                            <ThemedText style={[styles.detailLabel, { color: colors.tabIconDefault }]}>Last Service</ThemedText>
-                            <ThemedText style={{ color: colors.text }}>{formatDate(carData.lastService)}</ThemedText>
-                        </ThemedView>
-                        <ThemedView style={[styles.detailItem, { borderColor: colors.border }]}>
-                            <ThemedText style={[styles.detailLabel, { color: colors.tabIconDefault }]}>Next Service Due</ThemedText>
-                            <ThemedText style={[styles.nextService, { color: colors.tint }]}>
-                                {formatDate(carData.nextService)}
-                                <ThemedText style={[styles.daysAway, { color: colors.tabIconDefault }]}> (30 days)</ThemedText>
+                            <ThemedText style={[styles.vehicleName, { color: colors.text }]}>
+                                {carData.year} {carData.make} {carData.model}
+                            </ThemedText>
+                            <ThemedText style={[styles.licensePlate, { color: colors.tabIconDefault }]}>
+                                {carData.licensePlate} • {carData.mileage.toLocaleString()} mi
                             </ThemedText>
                         </ThemedView>
                     </ThemedView>
-
-                    {/* Progress Bar */}
-                    <ThemedView style={[styles.progressContainer, { borderTopColor: colors.border }]}>
-                        <ThemedView style={styles.progressHeader}>
-                            <ThemedText style={{ color: colors.text }}>Work Done</ThemedText>
-                            <ThemedText style={{ color: colors.text }}>{progress}% Complete</ThemedText>
-                        </ThemedView>
-                        <ThemedView style={[styles.progressBar, { backgroundColor: `${colors.tabIconDefault}20` }]}>
-                            <ThemedView
-                                style={[
-                                    styles.progressFill,
-                                    {
-                                        width: `${progress}%`,
-                                        backgroundColor: progress > 70
-                                            ? '#4CAF50'
-                                            : progress > 40
-                                                ? '#FFC107'
-                                                : '#F44336'
-                                    }
-                                ]}
-                            />
-                        </ThemedView>
+                    <ThemedView style={[styles.nextServiceContainer, { borderTopColor: colors.border }]}>
+                        <ThemedText style={[styles.nextServiceLabel, { color: colors.tabIconDefault }]}>
+                            Next Service Due:
+                        </ThemedText>
+                        <ThemedText style={{ color: colors.text, fontWeight: '500' }}>
+                            {formatDate(carData.nextService)}
+                        </ThemedText>
                     </ThemedView>
                 </ThemedView>
 
                 {/* Tabs */}
-                <ThemedView style={styles.tabs}>
-                    <TouchableOpacity
+                <ThemedView style={styles.tabContainer}>
+                    <TouchableOpacity 
                         style={[styles.tab, activeTab === 'history' && styles.activeTab]}
                         onPress={() => setActiveTab('history')}
                     >
@@ -242,7 +263,7 @@ export default function CarServices() {
                             Service History
                         </ThemedText>
                     </TouchableOpacity>
-                    <TouchableOpacity
+                    <TouchableOpacity 
                         style={[styles.tab, activeTab === 'upcoming' && styles.activeTab]}
                         onPress={() => setActiveTab('upcoming')}
                     >
@@ -254,96 +275,12 @@ export default function CarServices() {
 
                 {/* Service List */}
                 <ThemedView style={styles.serviceList}>
-                    {activeTab === 'history' ? (
-                        carData.serviceHistory.map((service) => (
-                            <TouchableOpacity
-                                key={service.id}
-                                style={[styles.serviceCard, { backgroundColor: Colors[colorScheme ?? 'light'].background }]}
-                                onPress={() => toggleService(service.id)}
-                            >
-                                <ThemedView style={styles.serviceHeader}>
-                                    <ThemedView>
-                                        <ThemedText type="subtitle">{service.type}</ThemedText>
-                                        <ThemedText style={styles.serviceDate}>{formatDate(service.date)} • {service.mileage.toLocaleString()} mi</ThemedText>
-                                    </ThemedView>
-                                    <ThemedView style={[styles.statusBadge, { backgroundColor: statusColors[service.status as keyof typeof statusColors] }]}>
-                                        <ThemedText style={styles.statusText}>
-                                            {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
-                                        </ThemedText>
-                                    </ThemedView>
-                                </ThemedView>
-
-                                {expandedService === service.id && (
-                                    <ThemedView style={styles.serviceDetails}>
-                                        <ThemedView style={styles.servicesList}>
-                                            {service.services.map((item, index) => (
-                                                <ThemedView key={index} style={styles.serviceItem}>
-                                                    <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
-                                                    <ThemedText style={styles.serviceItemText}>{item}</ThemedText>
-                                                </ThemedView>
-                                            ))}
-                                        </ThemedView>
-                                        {service.notes && (
-                                            <ThemedView style={styles.notesContainer}>
-                                                <ThemedText style={styles.notesLabel}>Mechanic&apos;s Notes:</ThemedText>
-                                                <ThemedText style={styles.notesText}>{service.notes}</ThemedText>
-                                            </ThemedView>
-                                        )}
-                                        <ThemedView style={styles.serviceFooter}>
-                                            <ThemedText style={styles.costText}>${service.cost.toFixed(2)}</ThemedText>
-                                            <TouchableOpacity style={styles.receiptButton}>
-                                                <Ionicons name="receipt-outline" size={16} color="#4a90e2" />
-                                                <ThemedText style={styles.receiptText}>ThemedView Receipt</ThemedText>
-                                            </TouchableOpacity>
-                                        </ThemedView>
-                                    </ThemedView>
-                                )}
-                            </TouchableOpacity>
-                        ))
-                    ) : (
-                        carData.upcomingServices.map((service) => (
-                            <ThemedView key={service.id} style={[styles.serviceCard, { backgroundColor: Colors[colorScheme ?? 'light'].background }]}>
-                                <ThemedView style={styles.serviceHeader}>
-                                    <ThemedView>
-                                        <ThemedText type="subtitle">{service.type}</ThemedText>
-                                        <ThemedText style={styles.serviceDate}>
-                                            Scheduled: {formatDate(service.scheduledDate)}
-                                        </ThemedText>
-                                    </ThemedView>
-                                    <ThemedView style={[styles.statusBadge, { backgroundColor: statusColors.scheduled }]}>
-                                        <ThemedText style={styles.statusText}>Scheduled</ThemedText>
-                                    </ThemedView>
-                                </ThemedView>
-
-                                <ThemedView style={styles.servicesList}>
-                                    {service.services.map((item, index) => (
-                                        <ThemedView key={index} style={styles.serviceItem}>
-                                            <Ionicons name="time-outline" size={16} color="#2196F3" />
-                                            <ThemedText style={styles.serviceItemText}>{item}</ThemedText>
-                                        </ThemedView>
-                                    ))}
-                                </ThemedView>
-
-                                <ThemedView style={styles.serviceFooter}>
-                                    <ThemedText style={styles.estimatedCost}>
-                                        {service.estimatedCost ? (
-                                            <>
-                                                Estimated: <ThemedText style={styles.costText}>${service.estimatedCost.toFixed(2)}</ThemedText>
-                                            </>
-                                        ) : 'Price available upon request'}
-                                    </ThemedText>
-                                    <TouchableOpacity style={styles.scheduleButton}>
-                                        <ThemedText style={styles.scheduleButtonText}>Schedule Service</ThemedText>
-                                    </TouchableOpacity>
-                                </ThemedView>
-                            </ThemedView>
-                        ))
-                    )}
+                    {(activeTab === 'history' ? carData.serviceHistory : carData.upcomingServices).map(renderServiceCard)}
                 </ThemedView>
             </ScrollView>
 
             {/* Quick Action Button */}
-            <TouchableOpacity style={styles.fab}>
+            <TouchableOpacity style={[styles.fab, { backgroundColor: colors.tint }]}>
                 <Ionicons name="add" size={24} color="white" />
             </TouchableOpacity>
         </ThemedView>
@@ -358,12 +295,13 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollContent: {
-        paddingBottom: 100, // Space for FAB button
+        padding: 16,
+        paddingBottom: 32,
     },
     vehicleCard: {
-        margin: 16,
         borderRadius: 12,
         padding: 16,
+        marginBottom: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -373,7 +311,7 @@ const styles = StyleSheet.create({
     vehicleHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: 12,
     },
     carIconContainer: {
         width: 48,
@@ -384,121 +322,93 @@ const styles = StyleSheet.create({
         marginRight: 12,
     },
     vehicleInfo: {
-        marginLeft: 12,
+        flex: 1,
+    },
+    vehicleName: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 4,
     },
     licensePlate: {
-        fontSize: 16,
-        color: '#8E8E93',
-        marginTop: 4,
+        fontSize: 14,
+        opacity: 0.8,
     },
-    vehicleDetails: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        marginTop: 8,
-    },
-    detailItem: {
-        width: '50%',
-        marginBottom: 12,
-        paddingRight: 8,
-    },
-    detailLabel: {
-        fontSize: 12,
-        color: '#8E8E93',
-        marginBottom: 2,
-    },
-    nextService: {
-        color: '#4CAF50',
-        fontWeight: '600',
-    },
-    daysAway: {
-        fontSize: 12,
-        color: '#8E8E93',
-    },
-    progressContainer: {
-        marginTop: 16,
-        paddingTop: 16,
+    nextServiceContainer: {
+        paddingTop: 12,
         borderTopWidth: 1,
+        marginTop: 12,
     },
-    progressHeader: {
+    nextServiceLabel: {
+        fontSize: 13,
+        marginBottom: 4,
+    },
+    tabContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 8,
-    },
-    progressBar: {
-        height: 8,
-        borderRadius: 4,
-        overflow: 'hidden',
-    },
-    progressFill: {
-        height: '100%',
-        borderRadius: 4,
-    },
-    tabs: {
-        flexDirection: 'row',
-        marginHorizontal: 16,
-        marginTop: 8,
-        borderBottomWidth: 1,
+        backgroundColor: 'rgba(0,0,0,0.05)',
+        borderRadius: 8,
+        padding: 4,
+        marginBottom: 16,
     },
     tab: {
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderBottomWidth: 2,
-        borderBottomColor: 'transparent',
-        marginRight: 8,
+        flex: 1,
+        paddingVertical: 8,
+        alignItems: 'center',
+        borderRadius: 6,
     },
     activeTab: {
-        borderBottomColor: '#4a90e2',
+        backgroundColor: 'white',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
     },
     tabText: {
-        color: '#8E8E93',
+        fontSize: 14,
         fontWeight: '500',
     },
     activeTabText: {
-        color: '#4a90e2',
+        color: '#0a7ea4',
+        fontWeight: '600',
     },
     serviceList: {
-        padding: 16,
+        gap: 12,
     },
     serviceCard: {
         borderRadius: 12,
         padding: 16,
-        marginBottom: 12,
+        borderWidth: 1,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
-        shadowRadius: 3,
+        shadowRadius: 2,
         elevation: 2,
     },
     serviceHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: 12,
+        alignItems: 'center',
+        marginBottom: 8,
     },
-    serviceHeaderContent: {
+    serviceType: {
+        fontSize: 16,
+        fontWeight: '600',
         flex: 1,
-        marginRight: 12,
-    },
-    serviceDate: {
-        fontSize: 12,
-        marginTop: 4,
     },
     statusBadge: {
-        paddingHorizontal: 10,
+        paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 12,
-        minWidth: 80,
-        alignItems: 'center',
+        marginLeft: 8,
     },
     statusText: {
         fontSize: 12,
-        color: 'white',
-        fontWeight: '500',
+        fontWeight: '600',
     },
-    serviceDetails: {
-        marginTop: 12,
-        paddingTop: 12,
-        borderTopWidth: 1,
+    serviceDate: {
+        fontSize: 13,
+        opacity: 0.8,
+        marginBottom: 12,
     },
     servicesList: {
         marginBottom: 12,
@@ -506,62 +416,50 @@ const styles = StyleSheet.create({
     serviceItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 6,
     },
     serviceItemText: {
         marginLeft: 8,
-    },
-    notesContainer: {
-        borderRadius: 8,
-        padding: 12,
-        marginTop: 8,
-    },
-    notesLabel: {
-        fontSize: 12,
-        color: '#8E8E93',
-        marginBottom: 4,
-    },
-    notesText: {
         fontSize: 14,
-        lineHeight: 20,
     },
     serviceFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 12,
         paddingTop: 12,
         borderTopWidth: 1,
+        marginTop: 'auto',
     },
     costText: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#4CAF50',
     },
-    estimatedCost: {
-        fontSize: 14,
-        color: '#8E8E93',
-    },
-    receiptButton: {
+    detailsButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 6,
+        paddingVertical: 6,
+        paddingHorizontal: 12,
         borderRadius: 6,
+        borderWidth: 1,
     },
-    receiptText: {
-        color: '#4a90e2',
-        marginLeft: 4,
+    detailsButtonText: {
+        marginRight: 4,
+        fontSize: 14,
         fontWeight: '500',
     },
-    scheduleButton: {
-        backgroundColor: '#4a90e2',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 6,
+    notesContainer: {
+        marginTop: 12,
+        padding: 12,
+        borderRadius: 8,
     },
-    scheduleButtonText: {
-        color: 'white',
-        fontWeight: '500',
+    notesLabel: {
+        fontSize: 13,
+        marginBottom: 4,
+        opacity: 0.8,
+    },
+    notesText: {
+        fontSize: 14,
+        lineHeight: 20,
     },
     fab: {
         position: 'absolute',
@@ -570,13 +468,12 @@ const styles = StyleSheet.create({
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#4a90e2',
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 4,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
-        shadowRadius: 3,
+        shadowRadius: 4,
+        elevation: 5,
     },
 });

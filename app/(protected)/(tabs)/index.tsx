@@ -39,7 +39,7 @@ export default function HomeScreen() {
       title: 'My Vehicle',
       icon: 'car',
       color: '#9b59b6',
-      onPress: () => router.push('/cars')
+      onPress: () => router.push('/services')
     },
     {
       title: 'Payments',
@@ -75,7 +75,7 @@ export default function HomeScreen() {
       title: 'Tire Rotation', 
       due: 'in 2,500 miles', 
       date: '2024-01-10',
-      icon: 'tire', 
+      icon: 'car', 
       color: '#2ecc71' 
     },
     { 
