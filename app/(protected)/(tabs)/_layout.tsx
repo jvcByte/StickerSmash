@@ -41,17 +41,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="repairs"
+        name="cars"
         options={{
-          title: 'Repairs',
-          tabBarIcon: ({ color, size, focused }) => <Ionicons name={focused ? 'build' : 'build-outline'} size={size} color={color} />,
+          title: 'Cars',
+          tabBarIcon: ({ color, size, focused }) => <Ionicons name={focused ? 'car' : 'car-outline'} size={size} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="history"
+        name="profile"
         options={{
-          title: 'History',
-          tabBarIcon: ({ color, size, focused }) => <Ionicons name={focused ? 'time' : 'time-outline'} size={size} color={color} />,
+          title: 'Profile',
+          tabBarIcon: ({ color, size, focused }) => <Ionicons name={focused ? 'person' : 'person-outline'} size={size} color={color} />,
         }}
       />
     </Tabs>
