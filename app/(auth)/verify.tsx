@@ -10,7 +10,6 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod/v3';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isClerkAPIResponseError, useSignUp } from '@clerk/clerk-expo';
-import { router } from 'expo-router';
 
 const verifySchema = z.object({
     code: z.string({ message: 'Code is required' }).min(6, 'Minimum of 6 characters'),
@@ -54,8 +53,8 @@ export default function VerifyScreen() {
             })
             if (signUpResult.status === 'complete') {
                 console.log('Sign up complete')
-                setActive({ session: signUpResult.createdSessionId })
-                router.push('/(protected)/(tabs)')
+                await setActive({ session: signUpResult.createdSessionId })
+                // Navigation is now handled by the auth layout
             } else {
                 console.log('Sign up not complete: ', signUpResult)
                 setError('root', { message: 'Could not verify code. Please try again' })
