@@ -19,7 +19,7 @@ export const useWarmUpBrowser = () => {
 // Handle any pending auth sessions
 WebBrowser.maybeCompleteAuthSession();
 
-export default function SignInWith() {
+export default function SignInWithGoogle() {
     const { isLoaded: isUserLoaded } = useUser();
     const { startSSOFlow } = useSSO();
     
@@ -57,7 +57,7 @@ export default function SignInWith() {
 
     return (
         <CustomButton
-            text="Sign In with Google"
+            text="Google"
             onPress={onPress}
         />
     )

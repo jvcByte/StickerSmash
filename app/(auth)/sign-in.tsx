@@ -4,6 +4,9 @@ import {
     KeyboardAvoidingView,
     Platform,
     View,
+    TouchableOpacity,
+    ScrollView,
+    StatusBar
 } from 'react-native';
 import CustomInput from '@/components/ui/CustomInput';
 import CustomButton from '@/components/ui/CustomButton';
@@ -12,8 +15,13 @@ import { z } from 'zod/v3';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isClerkAPIResponseError, useSignIn, useUser } from '@clerk/clerk-expo';
 import { router } from 'expo-router';
-import SignInWith from '@/components/SignInWith';
-import AuthNav from '@/components/AuthNav';
+import { Ionicons } from '@expo/vector-icons';
+
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
+import SignInWithGoogle from '@/components/SignInWithGoogle';
+
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type ClerkUser = {
     id: string;
@@ -92,93 +100,200 @@ export default function SignInScreen() {
         }
     }
 
+    const colorScheme = useColorScheme();
+    const colors = Colors[colorScheme ?? 'light'];
+
     return (
-        <KeyboardAvoidingView
-            style={styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+            <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} />
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.container}>
+                
+                <ScrollView 
+                    contentContainerStyle={styles.scrollContent}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <View style={styles.header}>
+                        <View style={[styles.logoContainer, { backgroundColor: colors.tint + '20' }]}>
+                            <Ionicons name="car-sport" size={60} color={colors.tint} />
+                        </View>
+                        <Text style={[styles.title, { color: colors.text }]}>Welcome Back</Text>
+                        <Text style={[styles.subtitle, { color: colors.tabIconDefault }]}>
+                            Sign in to continue to ROA AutoTech
+                        </Text>
+                    </View>
 
-            <Text style={styles.title}>Sign in</Text>
+                    <View style={styles.form}>
+                        <View style={styles.inputContainer}>
+                            <CustomInput<SignInField>
+                                name='email'
+                                control={control}
+                                placeholder='Email'
+                                autoCapitalize='none'
+                                keyboardType='email-address'
+                                autoComplete='email'
+                            />
+                        </View>
+                        <View style={styles.inputContainer}>
+                            <CustomInput<SignInField>
+                                name='password'
+                                control={control}
+                                placeholder='Password'
+                                secureTextEntry
+                            />
+                        </View>
+                        
+                        <TouchableOpacity 
+                            style={styles.forgotPassword}
+                            onPress={() => router.push('/forgot-password')}
+                        >
+                            <Text style={[styles.forgotPasswordText, { color: colors.tint }]}>
+                                Forgot Password?
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
 
-            <View style={styles.form} >
-                <CustomInput
-                    name='email'
-                    control={control}
-                    placeholder='Email'
-                    autoCapitalize='none'
-                    keyboardType='email-address'
-                    autoComplete='email'
-                />
-                <CustomInput
-                    name='password'
-                    control={control}
-                    placeholder='Password'
-                    secureTextEntry
-                />
-            </View>
-            {errors.root?.message && (
-                <Text style={styles.error}>{errors.root?.message}</Text>
-            )}
+                    {errors.root?.message && (
+                        <View style={styles.errorContainer}>
+                            <Ionicons name="warning" size={18} color="#ff3b30" />
+                            <Text style={styles.error}>{errors.root?.message}</Text>
+                        </View>
+                    )}
 
-            <CustomButton
-                text='Sign in'
-                onPress={handleSubmit(onSignIn)}
-            />
-            <View style={styles.orContainer}>
-                <View style={styles.orLine} />
-                <Text style={styles.or}>Or</Text>
-                <View style={styles.orLine} />
-            </View>
-            <SignInWith />  
+                    <CustomButton
+                        text='Sign In'
+                        onPress={handleSubmit(onSignIn)}
+                        style={[styles.signInButton, { backgroundColor: colors.tint }]}
+                        textStyle={styles.signInButtonText}
+                    />
 
-            <AuthNav title={'Don\'t have an account?'} text={'Sign up'} href={'/sign-up'} />
-        </KeyboardAvoidingView>
+                    <View style={styles.orContainer}>
+                        <View style={[styles.orLine, { backgroundColor: colors.border }]} />
+                        <Text style={[styles.or, { color: colors.tabIconDefault }]}>or continue with</Text>
+                        <View style={[styles.orLine, { backgroundColor: colors.border }]} />
+                    </View>
+                    
+                    <SignInWithGoogle />
+
+                    <View style={styles.footer}>
+                        <Text style={[styles.footerText, { color: colors.tabIconDefault }]}>
+                            Don&apos;t have an account?{' '}
+                        </Text>
+                        <TouchableOpacity onPress={() => router.push('/sign-up')}>
+                            <Text style={[styles.signUpText, { color: colors.tint }]}>Sign up</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+    },
+    scrollContent: {
+        flexGrow: 1,
+        padding: 24,
+        paddingTop: 40,
+    },
+    header: {
+        alignItems: 'center',
+        marginBottom: 32,
+    },
+    logoContainer: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
         justifyContent: 'center',
-        padding: 25,
-        gap: 8,
+        alignItems: 'center',
+        marginBottom: 16,
     },
-
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
+        fontSize: 28,
+        fontWeight: '700',
+        marginBottom: 8,
+        textAlign: 'center',
     },
-
+    subtitle: {
+        fontSize: 16,
+        textAlign: 'center',
+        marginBottom: 8,
+    },
     form: {
-        gap: 4,
+        marginBottom: 24,
     },
-
+    inputContainer: {
+        marginBottom: 16,
+    },
+    inputIcon: {
+        marginRight: 8,
+    },
+    forgotPassword: {
+        alignSelf: 'flex-end',
+        marginTop: 8,
+    },
+    forgotPasswordText: {
+        fontSize: 14,
+        fontWeight: '500',
+    },
+    errorContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 59, 48, 0.1)',
+        padding: 12,
+        borderRadius: 8,
+        marginBottom: 16,
+    },
     error: {
-        color: 'crimson',
-        fontSize: 12,
-        textAlign: 'center',
-        borderWidth: 1,
-        borderColor: 'crimson',
-        padding: 10,
-        borderRadius: 5,
-        backgroundColor: 'rgba(255, 0, 0, 0.1)',
+        color: '#ff3b30',
+        fontSize: 14,
+        marginLeft: 8,
+        flex: 1,
     },
-
-    or: {
-        textAlign: 'center',
-        paddingHorizontal: 12,
-        color: '#666',
-        backgroundColor: 'white',
-        zIndex: 1,
+    signInButton: {
+        width: '100%',
+        borderRadius: 12,
+        height: 56,
+        justifyContent: 'center',
+        marginBottom: 24,
+    },
+    signInButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: 'white',
     },
     orContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 12,
+        marginVertical: 16,
+    },
+    or: {
+        fontSize: 14,
+        paddingHorizontal: 12,
+        zIndex: 1,
+        backgroundColor: 'transparent',
     },
     orLine: {
         flex: 1,
-        height: 1.5,
-        backgroundColor: '#ddd',
+        height: 1,
+    },
+    footer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 24,
+        marginBottom: 16,
+    },
+    footerText: {
+        fontSize: 14,
+    },
+    signUpText: {
+        fontSize: 14,
+        fontWeight: '600',
     },
 });
