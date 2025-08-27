@@ -4,6 +4,10 @@ type CustomButtonProps = {
     text: string;
     style?: StyleProp<ViewStyle>;
     textStyle?: StyleProp<TextStyle>;
+    loading?: boolean;
+    variant?: 'solid' | 'outline' | 'primary' | 'secondary';
+    leftIcon?: React.ReactNode;
+    rightIcon?: React.ReactNode;
 } & PressableProps;
 
 
@@ -11,6 +15,10 @@ export default function CustomButton({
     text,
     style,
     textStyle,
+    loading,
+    variant = 'outline',
+    leftIcon,
+    rightIcon,
     ...props
 }: CustomButtonProps) {
     return (
@@ -18,11 +26,13 @@ export default function CustomButton({
             {...props}
             style={[styles.button, style]}
         >
+            {leftIcon}
             <Text
                 style={[styles.buttonText, textStyle]}
             >
-                {text}
+                {loading ? 'Loading...' : text}
             </Text>
+            {rightIcon}
         </Pressable>
     )
 }

@@ -12,7 +12,7 @@ type ClerkUser = {
 
 export default function AuthLayout() {
     console.log('Auth Layout')
-    const { isLoaded, isSignedIn } = useAuth();
+    const { isLoaded: isAuthLoaded, isSignedIn } = useAuth();
     const { user, isLoaded: isUserLoaded } = useUser();
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const clerkUser = user as ClerkUser | null | undefined;
@@ -20,10 +20,11 @@ export default function AuthLayout() {
 
     useEffect(() => {
         // Only check auth status when both auth and user data are loaded
-        if (isLoaded && isUserLoaded) {
+        if (isAuthLoaded && isUserLoaded) {
+            console.log('Auth check complete', { isSignedIn, isAdmin });
             setIsCheckingAuth(false);
         }
-    }, [isLoaded, isUserLoaded]);
+    }, [isAuthLoaded, isUserLoaded, isSignedIn, isAdmin]);
 
     // Show loading indicator while checking auth state
     if (isCheckingAuth) {
@@ -36,6 +37,7 @@ export default function AuthLayout() {
 
     // If user is signed in, redirect to appropriate dashboard
     if (isSignedIn) {
+        console.log('User is signed in, redirecting...', { isAdmin });
         if (isAdmin === 'admin') {
             return <Redirect href="/(protected)/(admin)" />;
         }
@@ -45,7 +47,13 @@ export default function AuthLayout() {
         <Stack>
             <Stack.Screen name="sign-in" options={{ headerShown: false, title: 'Sign In' }} />
             <Stack.Screen name="sign-up" options={{ headerShown: false, title: 'Sign Up' }} />
-            <Stack.Screen name="verify" options={{ headerShown: false, title: 'Verify' }} />
+            <Stack.Screen name="verify"
+                options={{
+                    headerShown: true,
+                    title: '',
+                    headerLeft: () => <></>,
+                    headerShadowVisible: false,
+                }} />
         </Stack>
     )
 

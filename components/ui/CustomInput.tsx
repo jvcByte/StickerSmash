@@ -3,10 +3,15 @@ import { Control, Controller, FieldValues, Path } from "react-hook-form";
 
 type CustomInputProps<T extends FieldValues> = {
     control: Control<T>;
+    label?: string;
     name: Path<T>;
+    leftIcon?: React.ReactNode;
+    rightIcon?: React.ReactNode;
+    error?: string;
+    loading?: boolean;
 } & TextInputProps;
 
-export default function CustomInput<T extends FieldValues>({control, name, ...props}: CustomInputProps<T>) {
+export default function CustomInput<T extends FieldValues>({control, label, name, leftIcon, rightIcon, ...props}: CustomInputProps<T>) {
     return (
         <Controller
             control={control}
@@ -16,6 +21,8 @@ export default function CustomInput<T extends FieldValues>({control, name, ...pr
                 fieldState: { error }
             }) => (
                 <View style={styles.container}>
+                    {label && <Text style={styles.label}>{label}</Text>}
+                    {leftIcon}
                     <TextInput
                         {...props}
                         value={value}
@@ -53,5 +60,9 @@ const styles = StyleSheet.create({
     inputError: {
         borderColor: 'crimson',
         borderWidth: 1,
+    },
+    label: {
+        fontSize: 12,
+        color: '#666',
     },
 });
