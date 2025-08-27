@@ -117,6 +117,7 @@ export default function WelcomeScreen() {
                     text="Sign In"
                     onPress={() => router.push('/sign-in')}
                     style={[styles.button, { backgroundColor: colors.tint }]}
+                    textStyle={{ color: colors.background }}
                 />
                 <CustomButton
                     text="Create Account"
@@ -185,7 +186,7 @@ const styles = StyleSheet.create({
     outlineButton: {
         backgroundColor: 'transparent',
         borderWidth: 1,
-        borderColor: '#4353fd',
+        borderColor: Colors.light.tint,
     },
     guestButton: {
         alignItems: 'center',

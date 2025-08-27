@@ -1,25 +1,25 @@
+import CustomButton from '@/components/ui/CustomButton';
+import CustomInput from '@/components/ui/CustomInput';
+import { isClerkAPIResponseError, useSignIn, useUser } from '@clerk/clerk-expo';
+import { Ionicons } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { router } from 'expo-router';
+import { useForm } from 'react-hook-form';
 import {
-    StyleSheet,
-    Text,
     KeyboardAvoidingView,
     Platform,
-    View,
-    TouchableOpacity,
     ScrollView,
-    StatusBar
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
-import CustomInput from '@/components/ui/CustomInput';
-import CustomButton from '@/components/ui/CustomButton';
-import { useForm } from 'react-hook-form';
 import { z } from 'zod/v3';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { isClerkAPIResponseError, useSignIn, useUser } from '@clerk/clerk-expo';
-import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colors } from '@/constants/Colors';
 import SignInWithGoogle from '@/components/SignInWithGoogle';
+import { Colors } from '@/constants/Colors';
+import { useColorScheme } from '@/hooks/useColorScheme';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -109,8 +109,8 @@ export default function SignInScreen() {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.container}>
-                
-                <ScrollView 
+
+                <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     keyboardShouldPersistTaps="handled"
                 >
@@ -143,8 +143,8 @@ export default function SignInScreen() {
                                 secureTextEntry
                             />
                         </View>
-                        
-                        <TouchableOpacity 
+
+                        <TouchableOpacity
                             style={styles.forgotPassword}
                             onPress={() => router.push('/forgot-password')}
                         >
@@ -165,7 +165,7 @@ export default function SignInScreen() {
                         text='Sign In'
                         onPress={handleSubmit(onSignIn)}
                         style={[styles.signInButton, { backgroundColor: colors.tint }]}
-                        textStyle={styles.signInButtonText}
+                        textStyle={[styles.signInButtonText, { color: colors.background }]}
                     />
 
                     <View style={styles.orContainer}>
@@ -173,9 +173,10 @@ export default function SignInScreen() {
                         <Text style={[styles.or, { color: colors.tabIconDefault }]}>or continue with</Text>
                         <View style={[styles.orLine, { backgroundColor: colors.border }]} />
                     </View>
-                    
-                    <SignInWithGoogle style={[styles.signInButton, { backgroundColor: colors.tint }]} />
 
+                    <SignInWithGoogle style={[styles.googleButton, {
+                        backgroundColor: colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.6)'
+                    }]} />
                     <View style={styles.footer}>
                         <Text style={[styles.footerText, { color: colors.tabIconDefault }]}>
                             Don&apos;t have an account?{' '}
@@ -295,5 +296,12 @@ const styles = StyleSheet.create({
     signUpText: {
         fontSize: 14,
         fontWeight: '600',
+    },
+    googleButton: {
+        width: '100%',
+        borderRadius: 12,
+        height: 56,
+        justifyContent: 'center',
+        marginBottom: 24,
     },
 });
