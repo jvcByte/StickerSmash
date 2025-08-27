@@ -1,4 +1,15 @@
-import { StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, Alert } from 'react-native';
+import { 
+  StyleSheet, 
+  KeyboardAvoidingView, 
+  Platform, 
+  TouchableOpacity, 
+  Alert, 
+  View, 
+  TextInput,
+  NativeSyntheticEvent,
+  TextInputKeyPressEventData,
+  Clipboard
+} from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { useForm } from 'react-hook-form';
@@ -6,12 +17,11 @@ import { z } from 'zod/v3';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSignIn, useSignUp, isClerkAPIResponseError } from '@clerk/clerk-expo';
 import { router, useLocalSearchParams } from 'expo-router';
-import CustomInput from '@/components/ui/CustomInput';
 import CustomButton from '@/components/ui/CustomButton';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const verificationSchema = z.object({
     code: z.string().length(6, { message: 'Verification code must be 6 digits' }),
@@ -23,12 +33,14 @@ export default function VerifyScreen() {
     const colorScheme = useColorScheme();
     const colors = Colors[colorScheme ?? 'light'];
     const { email } = useLocalSearchParams<{ email: string }>();
-    const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
-    const { signUp, setActive: setSignUpActive, isLoaded: isSignUpLoaded } = useSignUp();
+    const { signIn, isLoaded: isSignInLoaded } = useSignIn();
+    const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
     const [isResending, setIsResending] = useState(false);
     const [resendCooldown, setResendCooldown] = useState(30);
     const [isVerifying, setIsVerifying] = useState(false);
     const [emailAddress, setEmailAddress] = useState('');
+    const [digits, setDigits] = useState(Array(6).fill(''));
+    const inputRefs = useRef<(TextInput | null)[]>(Array(6).fill(null));
 
     // Get email from params or signUp state
     useEffect(() => {
@@ -39,12 +51,7 @@ export default function VerifyScreen() {
         }
     }, [email, signUp?.emailAddress]);
 
-    const {
-        control,
-        handleSubmit,
-        formState: { errors },
-        setError,
-    } = useForm<VerificationField>({
+    const { handleSubmit, formState: { errors }, setError, setValue } = useForm<VerificationField>({
         resolver: zodResolver(verificationSchema),
         defaultValues: {
             code: '',
@@ -64,55 +71,88 @@ export default function VerifyScreen() {
         };
     }, [resendCooldown]);
 
+    const handleDigitChange = (text: string, index: number) => {
+        // Only handle paste on the first input to avoid multiple triggers
+        if (text.length > 1 && index === 0) {
+            const code = text.replace(/\D/g, ''); // Remove non-digits
+            if (code.length === 6) {
+                const newDigits = [...digits];
+                for (let i = 0; i < 6; i++) {
+                    newDigits[i] = code[i] || '';
+                }
+                setDigits(newDigits);
+                setValue('code', newDigits.join(''));
+                inputRefs.current[5]?.focus();
+            }
+            return;
+        }
+        
+        // Regular single digit input
+        const newDigits = [...digits];
+        newDigits[index] = text;
+        setDigits(newDigits);
+        setValue('code', newDigits.join(''));
+        
+        // Move to next input or submit if last digit
+        if (text && index < 5) {
+            inputRefs.current[index + 1]?.focus();
+        } else if (index === 5 && text) {
+            handleSubmit(handleVerification)();
+        }
+    };
+    
+    const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>, index: number) => {
+        // Handle backspace
+        if (e.nativeEvent.key === 'Backspace' && !digits[index] && index > 0) {
+            const newDigits = [...digits];
+            newDigits[index - 1] = '';
+            setDigits(newDigits);
+            setValue('code', newDigits.join(''));
+            inputRefs.current[index - 1]?.focus();
+        }
+    };
+    
     const handleVerification = async (data: VerificationField) => {
-        if (!isSignInLoaded || !isSignUpLoaded) return;
+        if (!isSignInLoaded && !isSignUpLoaded) return;
+        
         setIsVerifying(true);
-
+        
         try {
             // Try to complete sign up first
             if (signUp) {
                 const completeSignUp = await signUp.attemptEmailAddressVerification({
                     code: data.code,
                 });
-
+                
                 if (completeSignUp.status === 'complete') {
-                    await setSignUpActive({ session: completeSignUp.createdSessionId });
                     router.replace('/(protected)/(tabs)');
                     return;
                 }
             }
-
-            // If not signing up, try to verify sign in
-            if (signIn) {
-                const completeSignIn = await signIn.attemptFirstFactor({
+            
+            // If no sign up or sign up is already complete, try sign in
+            if (isSignInLoaded) {
+                const result = await signIn.attemptFirstFactor({
                     strategy: 'email_code',
                     code: data.code,
                 });
-
-                if (completeSignIn.status === 'complete') {
-                    await setActive({ session: completeSignIn.createdSessionId });
+                
+                if (result.status === 'complete') {
                     router.replace('/(protected)/(tabs)');
-                    return;
                 }
             }
-
-            // If we get here, verification failed
-            setError('code', {
-                type: 'manual',
-                message: 'Invalid verification code. Please try again.',
-            });
         } catch (err) {
             console.log(JSON.stringify(err, null, 2));
             
             if (isClerkAPIResponseError(err)) {
                 setError('code', {
                     type: 'manual',
-                    message: err.errors?.[0]?.longMessage || 'Verification failed. Please try again.',
+                    message: err.errors[0]?.longMessage || err.errors[0]?.message,
                 });
             } else {
                 setError('code', {
                     type: 'manual',
-                    message: 'An error occurred during verification. Please try again.',
+                    message: 'An error occurred. Please try again.'
                 });
             }
         } finally {
@@ -173,23 +213,53 @@ export default function VerifyScreen() {
 
                 <ThemedView style={styles.formContainer}>
                     <ThemedView style={styles.codeInputContainer}>
-                      <CustomInput
-                          control={control}
-                          name="code"
-                          label="Verification Code"
-                          placeholder="Enter 6-digit code"
-                          keyboardType="number-pad"
-                          maxLength={6}
-                          error={errors.code?.message}
-                          style={styles.codeInput}
-                      />
+                        <ThemedText style={[styles.label, { color: colors.tabIconDefault }]}>
+                            Verification Code
+                        </ThemedText>
+                        <View style={styles.digitsContainer}>
+                            {digits.map((digit, index) => (
+                                <TextInput
+                                    key={index}
+                                    ref={el => { if (el) inputRefs.current[index] = el }}
+                                    style={[
+                                        styles.digitInput,
+                                        errors.code && styles.digitInputError,
+                                        { borderColor: colors.tabIconDefault + '50' }
+                                    ]}
+                                    value={digit}
+                                    onChangeText={(text) => handleDigitChange(text, index)}
+                                    onKeyPress={(e) => handleKeyPress(e, index)}
+                                    onFocus={async () => {
+                                        // Only trigger paste on first input when empty
+                                        if (index === 0 && !digits.some(d => d)) {
+                                            const text = await Clipboard.getString();
+                                            const code = text.replace(/\D/g, '');
+                                            if (code.length === 6) {
+                                                handleDigitChange(code, 0);
+                                            }
+                                        }
+                                    }}
+                                    keyboardType="number-pad"
+                                    maxLength={6} // Allow pasting longer text
+                                    selectTextOnFocus
+                                    editable={!isVerifying}
+                                    contextMenuHidden={false}
+                                />
+                            ))}
+                        </View>
+                        {errors.code?.message && (
+                            <ThemedText style={styles.errorText}>
+                                {errors.code.message}
+                            </ThemedText>
+                        )}
                     </ThemedView>
 
                     <CustomButton
                         text={isVerifying ? 'Verifying...' : 'Verify Email'}
                         onPress={handleSubmit(handleVerification)}
                         loading={isVerifying}
-                        style={styles.verifyButton}
+                        style={[styles.verifyButton, { backgroundColor: colors.tint }]}
+                        textStyle={[styles.verifyButtonText, { color: colors.background }]}
                     />
 
                     <ThemedView style={styles.resendContainer}>
@@ -277,17 +347,36 @@ const styles = StyleSheet.create({
         width: '100%',
         marginBottom: 30,
     },
-    codeInput: {
+    label: {
+        fontSize: 14,
+        marginBottom: 8,
+        alignSelf: 'flex-start',
+    },
+    digitsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginBottom: 4,
+    },
+    digitInput: {
+        width: 44,
+        height: 60,
         borderWidth: 1,
-        borderColor: '#ccc',
         borderRadius: 8,
-        padding: 12,
         textAlign: 'center',
-        letterSpacing: 5,
-        fontSize: 18,
+        fontSize: 24,
         fontWeight: 'bold',
         backgroundColor: 'white',
-        minHeight: 40,
+    },
+    digitInputError: {
+        borderColor: '#ff3b30',
+        backgroundColor: 'rgba(255, 59, 48, 0.05)',
+    },
+    errorText: {
+        color: '#ff3b30',
+        fontSize: 12,
+        marginTop: 4,
+        alignSelf: 'flex-start',
     },
     verifyButton: {
         marginTop: 10,
@@ -304,6 +393,7 @@ const styles = StyleSheet.create({
     resendLink: {
         fontSize: 14,
         fontWeight: '600',
+        marginLeft: 4,
     },
     backButton: {
         flexDirection: 'row',
@@ -316,5 +406,9 @@ const styles = StyleSheet.create({
     },
     backText: {
         fontSize: 14,
+    },
+    verifyButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
