@@ -3,6 +3,11 @@ import { useEffect, useCallback } from "react";
 import * as WebBrowser from 'expo-web-browser';
 import { useSSO, useUser } from "@clerk/clerk-expo";
 import * as AuthSession from "expo-auth-session";
+import { StyleProp, ViewStyle } from "react-native";
+
+type SignInWithGoogleProps = {
+    style?: StyleProp<ViewStyle>;
+}
 
 export const useWarmUpBrowser = () => {
     useEffect(() => {
@@ -19,7 +24,7 @@ export const useWarmUpBrowser = () => {
 // Handle any pending auth sessions
 WebBrowser.maybeCompleteAuthSession();
 
-export default function SignInWithGoogle() {
+export default function SignInWithGoogle({style}: SignInWithGoogleProps) {
     const { isLoaded: isUserLoaded } = useUser();
     const { startSSOFlow } = useSSO();
     
@@ -59,6 +64,7 @@ export default function SignInWithGoogle() {
         <CustomButton
             text="Google"
             onPress={onPress}
+            style={style}
         />
     )
 }

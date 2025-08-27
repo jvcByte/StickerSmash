@@ -174,7 +174,7 @@ export default function SignInScreen() {
                         <View style={[styles.orLine, { backgroundColor: colors.border }]} />
                     </View>
                     
-                    <SignInWithGoogle />
+                    <SignInWithGoogle style={[styles.signInButton, { backgroundColor: colors.tint }]} />
 
                     <View style={styles.footer}>
                         <Text style={[styles.footerText, { color: colors.tabIconDefault }]}>
