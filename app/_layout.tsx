@@ -4,10 +4,29 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { ClerkProvider } from '@clerk/clerk-expo';
-import { tokenCache } from '@clerk/clerk-expo/token-cache';
+import * as SecureStore from 'expo-secure-store';
 import { AdminProvider } from '@/contexts/AdminProvider';
-
 import { useColorScheme } from '@/hooks/useColorScheme';
+
+// Secure token cache for Clerk
+const tokenCache = {
+  async getToken(key: string) {
+    try {
+      return await SecureStore.getItemAsync(key);
+    } catch (error) {
+      console.log('getToken error: ', error);
+      return null;
+    }
+  },
+  async saveToken(key: string, value: string) {
+    try {
+      return await SecureStore.setItemAsync(key, value);
+    } catch (error) {
+      console.log('saveToken error: ', error);
+      return;
+    }
+  },
+};
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();

@@ -8,7 +8,7 @@ import { useSignIn } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import {
     ActivityIndicator,
@@ -40,6 +40,17 @@ export default function ResetPasswordScreen() {
     const { email } = useLocalSearchParams<{ email: string }>();
     const [isLoading, setIsLoading] = useState(false);
     const [resendCooldown, setResendCooldown] = useState(30);
+
+    // Countdown timer for resend code (minimize rerenders, like verify.tsx)
+    useEffect(() => {
+        let timer: ReturnType<typeof setTimeout>;
+        if (resendCooldown > 0) {
+            timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+        }
+        return () => {
+            if (timer) clearTimeout(timer);
+        };
+    }, [resendCooldown]);
     const [digits, setDigits] = useState<string[]>(new Array(6).fill(''));
     const { signIn, isLoaded, setActive } = useSignIn();
     const router = useRouter();
@@ -154,12 +165,6 @@ export default function ResetPasswordScreen() {
 
                 // Start cooldown
                 setResendCooldown(30);
-                const timer = setInterval(() => {
-                    setResendCooldown((prev) => (prev > 0 ? prev - 1 : 0));
-                    if (resendCooldown <= 0) {
-                        clearInterval(timer);
-                    }
-                }, 1000);
 
                 Alert.alert('Success', 'A new verification code has been sent to your email.');
             }

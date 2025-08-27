@@ -36,7 +36,10 @@ const signInSchema = z.object({
     password: z.string({ message: 'Password is required' }).min(8, 'Minimum of 8 characters'),
 });
 
-type SignInField = z.infer<typeof signInSchema>;
+type SignInField = {
+    email: string;
+    password: string;
+};
 
 const mapClerkErrorToFormField = (error: any) => {
     switch (error.meta?.paramName) {
@@ -58,6 +61,11 @@ export default function SignInScreen() {
         setError
     } = useForm<SignInField>({
         resolver: zodResolver(signInSchema),
+        defaultValues: {
+            email: '',
+            password: ''
+        },
+        mode: 'onChange'
     });
     const { signIn, isLoaded, setActive } = useSignIn();
     const { user } = useUser();
