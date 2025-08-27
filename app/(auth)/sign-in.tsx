@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { useForm } from 'react-hook-form';
 import {
+    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -68,7 +69,14 @@ export default function SignInScreen() {
     const onSignIn = async ({ email, password }: SignInField) => {
         console.log('Sign in: ', { email, password })
 
-        if (!isLoaded) return;
+        if (!isLoaded) {
+            console.log('Sign in not loaded')
+            return (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <ActivityIndicator size="large" />
+                </View>
+            );
+        }
 
         try {
             const signInResult = await signIn.create({
@@ -230,7 +238,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     inputContainer: {
-        marginBottom: 16,
+        marginBottom: 0,
     },
     inputIcon: {
         marginRight: 8,

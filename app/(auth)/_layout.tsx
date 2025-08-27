@@ -1,7 +1,7 @@
-import { Stack, Redirect } from "expo-router";
 import { useAuth, useUser } from "@clerk/clerk-expo";
-import { View, ActivityIndicator } from "react-native";
+import { Redirect, Stack } from "expo-router";
 import { useEffect, useState } from "react";
+import { ActivityIndicator, View } from "react-native";
 
 type ClerkUser = {
     id: string;
@@ -63,6 +63,8 @@ export default function AuthLayout() {
                     headerLeft: () => <></>,
                     headerShadowVisible: false,
                 }} />
+            <Stack.Screen name="forgot-password" options={{ headerShown: false, title: 'Forgot Password' }} />
+            <Stack.Screen name="reset-password" options={{ headerShown: false, title: 'Reset Password' }} />
         </Stack>
     )
 

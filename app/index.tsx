@@ -131,6 +131,24 @@ export default function WelcomeScreen() {
                 >
                     <ThemedText style={{ color: colors.tint }}>Continue as Guest</ThemedText>
                 </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.guestButton}
+                    onPress={() => router.push('/(auth)/verify')}
+                >
+                    <ThemedText style={{ color: colors.tint }}>Verify</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.guestButton}
+                    onPress={() => router.push('/(auth)/reset-password')}
+                >
+                    <ThemedText style={{ color: colors.tint }}>Reset Password</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.guestButton}
+                    onPress={() => router.push('/(auth)/forgot-password')}
+                >
+                    <ThemedText style={{ color: colors.tint }}>Forgot Password</ThemedText>
+                </TouchableOpacity>
             </View>
         </ThemedView>
     );

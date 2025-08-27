@@ -218,10 +218,10 @@ const styles = StyleSheet.create({
         color: '#666',
     },
     form: {
-        marginBottom: 24,
+        marginBottom: 0,
     },
     inputContainer: {
-        marginBottom: 16,
+        marginBottom: 0,
     },
     errorContainer: {
         flexDirection: 'row',

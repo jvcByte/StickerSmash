@@ -46,7 +46,5 @@ scripts/
 # example app
 app-example
 
-# .ts files
-app/(auth)/forgot-password.tsx
 
 
