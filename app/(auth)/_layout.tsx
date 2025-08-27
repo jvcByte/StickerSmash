@@ -12,8 +12,8 @@ type ClerkUser = {
 
 export default function AuthLayout() {
     console.log('Auth Layout')
-    const { isLoaded: isAuthLoaded, isSignedIn } = useAuth();
-    const { user, isLoaded: isUserLoaded } = useUser();
+    const { isLoaded: isAuthLoaded, isSignedIn } = useAuth() || {};
+    const { user, isLoaded: isUserLoaded } = useUser() || {};
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const clerkUser = user as ClerkUser | null | undefined;
     const isAdmin = clerkUser?.publicMetadata?.role;
@@ -25,6 +25,15 @@ export default function AuthLayout() {
             setIsCheckingAuth(false);
         }
     }, [isAuthLoaded, isUserLoaded, isSignedIn, isAdmin]);
+
+    // If Clerk isn't loaded yet, show loading state
+    if (!isAuthLoaded || !isUserLoaded) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" />
+            </View>
+        );
+    }
 
     // Show loading indicator while checking auth state
     if (isCheckingAuth) {

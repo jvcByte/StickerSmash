@@ -1,16 +1,16 @@
-import { StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { FontAwesome5, Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const colors = Colors[colorScheme ?? 'light'];
-  
+
   // User-specific data
   const vehicleStatus = {
     make: 'Toyota',
@@ -62,29 +62,29 @@ export default function HomeScreen() {
   ];
 
   const upcomingServices = [
-    { 
-      id: '1', 
-      title: 'Oil Change', 
-      due: 'in 1,200 miles', 
+    {
+      id: '1',
+      title: 'Oil Change',
+      due: 'in 1,200 miles',
       date: '2023-12-15',
-      icon: 'oil-can', 
-      color: '#3498db' 
+      icon: 'oil-can',
+      color: '#3498db'
     },
-    { 
-      id: '2', 
-      title: 'Tire Rotation', 
-      due: 'in 2,500 miles', 
+    {
+      id: '2',
+      title: 'Tire Rotation',
+      due: 'in 2,500 miles',
       date: '2024-01-10',
-      icon: 'car', 
-      color: '#2ecc71' 
+      icon: 'car',
+      color: '#2ecc71'
     },
-    { 
-      id: '3', 
-      title: 'Brake Inspection', 
-      due: 'in 5,000 miles', 
+    {
+      id: '3',
+      title: 'Brake Inspection',
+      due: 'in 5,000 miles',
       date: '2024-02-20',
-      icon: 'car-crash', 
-      color: '#e74c3c' 
+      icon: 'car-crash',
+      color: '#e74c3c'
     },
   ];
 
@@ -95,7 +95,7 @@ export default function HomeScreen() {
           Welcome back! Here&apos;s what&apos;s happening today.
         </ThemedText>
       </ThemedView>
-      
+
       {/* Vehicle Status */}
       <ThemedView style={styles.statsContainer}>
         <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>My Vehicle</ThemedText>
@@ -108,7 +108,7 @@ export default function HomeScreen() {
               VIN: 1HGCM82633A123456
             </ThemedText>
           </ThemedView>
-          
+
           <ThemedView style={styles.vehicleStats}>
             <ThemedView style={styles.vehicleStat}>
               <ThemedText style={[styles.statValue, { color: colors.tint }]}>{vehicleStatus.health}%</ThemedText>
@@ -123,7 +123,7 @@ export default function HomeScreen() {
               <ThemedText style={[styles.statLabel, { color: colors.tabIconDefault }]}>Spent</ThemedText>
             </ThemedView>
           </ThemedView>
-          
+
           <ThemedView style={styles.serviceReminder}>
             <FontAwesome5 name="bell" size={16} color="#f39c12" style={styles.bellIcon} />
             <ThemedText style={[styles.reminderText, { color: colors.text }]}>
@@ -145,9 +145,9 @@ export default function HomeScreen() {
               style={[styles.actionButton, { backgroundColor: `${action.color}15` }]}
               onPress={action.onPress}
             >
-              <FontAwesome5 
-                name={action.icon as any} 
-                size={20} 
+              <FontAwesome5
+                name={action.icon as any}
+                size={20}
                 color={action.color}
                 style={styles.actionIcon}
               />
@@ -169,12 +169,12 @@ export default function HomeScreen() {
             <ThemedText style={{ color: colors.tint }}>View All</ThemedText>
           </TouchableOpacity>
         </ThemedView>
-        
+
         <ThemedView style={styles.servicesList}>
           {upcomingServices.map((service) => (
-            <TouchableOpacity 
+            <TouchableOpacity
               key={service.id}
-              style={[styles.serviceItem, { 
+              style={[styles.serviceItem, {
                 backgroundColor: colors.background,
                 borderLeftColor: service.color,
                 borderLeftWidth: 4,
@@ -197,7 +197,7 @@ export default function HomeScreen() {
           ))}
         </ThemedView>
       </ThemedView>
-      
+
       {/* Quick Help */}
       <ThemedView style={[styles.section, { backgroundColor: colors.background }]}>
         <ThemedText style={[styles.sectionTitle, { color: colors.text, marginBottom: 12 }]}>
@@ -206,7 +206,7 @@ export default function HomeScreen() {
         <ThemedText style={[styles.helpText, { color: colors.tabIconDefault }]}>
           Our service team is available 24/7 to assist you with any questions about your vehicle or upcoming services.
         </ThemedText>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.helpButton, { backgroundColor: colors.tint }]}
           onPress={() => router.push('/support')}
         >
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
   },
-  
+
   // Services List
   servicesList: {
     marginTop: 8,
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     opacity: 0.8,
   },
-  
+
   // Help Section
   helpText: {
     fontSize: 14,

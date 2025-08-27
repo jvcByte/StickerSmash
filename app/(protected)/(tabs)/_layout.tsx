@@ -3,18 +3,18 @@ import React from 'react';
 import { Platform, View } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
+import { NotificationBadge } from '@/components/NotificationBadge';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
-import { useUser, useAuth } from '@clerk/clerk-expo';
-import { NotificationBadge } from '@/components/NotificationBadge';
 
 type ClerkUser = {
-    id: string;
-    publicMetadata?: {
-        role?: string;
-    };
+  id: string;
+  publicMetadata?: {
+    role?: string;
+  };
 };
 
 export default function TabLayout() {
@@ -25,10 +25,10 @@ export default function TabLayout() {
   const clerkUser = user as ClerkUser | null | undefined;
   const { isSignedIn } = useAuth();
   const isAdmin = clerkUser?.publicMetadata?.role;
-  if(!isSignedIn){
+  if (!isSignedIn) {
     return <Redirect href="/(auth)/sign-in" />;
   }
-  
+
   if (isSignedIn && isAdmin === 'admin') {
     return <Redirect href="/(protected)/(admin)" />;
   }
@@ -44,13 +44,13 @@ export default function TabLayout() {
   const renderTabBarIcon = (name: string, focused: boolean, iconName: string, count: number) => {
     const iconFilled = iconName as keyof typeof Ionicons.glyphMap;
     const iconOutline = `${iconName}-outline` as keyof typeof Ionicons.glyphMap;
-    
+
     return (
       <View style={{ width: 24, height: 24, alignItems: 'center', justifyContent: 'center' }}>
-        <Ionicons 
-          name={focused ? iconFilled : iconOutline} 
-          size={24} 
-          color={focused ? Colors[colorScheme ?? 'light'].tint : '#8E8E93'} 
+        <Ionicons
+          name={focused ? iconFilled : iconOutline}
+          size={24}
+          color={focused ? Colors[colorScheme ?? 'light'].tint : '#8E8E93'}
         />
         {count > 0 && <NotificationBadge count={count} size={18} />}
       </View>
@@ -62,6 +62,7 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         tabBarInactiveTintColor: '#8E8E93',
+        headerShown: false,
         headerStyle: {
           backgroundColor: Colors[colorScheme ?? 'light'].background,
           shadowColor: Colors[colorScheme ?? 'light'].background,
@@ -93,8 +94,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          headerShown: true,
           title: 'Dashboard',
-          tabBarIcon: ({ color, size, focused }) => 
+          tabBarIcon: ({ color, size, focused }) =>
             renderTabBarIcon('dashboard', focused, 'speedometer', notificationCounts.dashboard),
         }}
       />
@@ -102,7 +104,7 @@ export default function TabLayout() {
         name="services"
         options={{
           title: 'Service',
-          tabBarIcon: ({ color, size, focused }) => 
+          tabBarIcon: ({ color, size, focused }) =>
             renderTabBarIcon('cars', focused, 'car-sport', notificationCounts.cars),
         }}
       />
@@ -110,25 +112,31 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size, focused }) => 
+          tabBarIcon: ({ color, size, focused }) =>
             renderTabBarIcon('profile', focused, 'person', notificationCounts.profile),
         }}
       />
       <Tabs.Screen
         name='payments'
         options={{
+          title: 'Payments',
+          headerShown: true,
           href: null
         }}
       />
       <Tabs.Screen
         name='support'
         options={{
+          title: 'Support',
+          headerShown: true,
           href: null
         }}
       />
       <Tabs.Screen
         name='documents'
         options={{
+          title: 'Documents',
+          headerShown: true,
           href: null
         }}
       />
