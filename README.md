@@ -111,6 +111,7 @@ implement themeing (dark and light mode)
 ## Technical Implementation Guidelines
 
 ### Project Structure
+```
 mech-op/
 ├── app/                          # Expo Router file-based routing (main app logic)
 │   ├── (auth)/                   # Auth group layout
@@ -273,6 +274,7 @@ mech-op/
 ├── .env.example                  # Environment variables template
 ├── README.md                     # Project documentation
 └── yarn.lock / package-lock.json # Dependency lock file
+```
 
 ### Code Quality & Best Practices
 - **TypeScript** for type safety and better developer experience
